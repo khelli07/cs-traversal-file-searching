@@ -59,7 +59,10 @@ namespace FileSearching
                         found = false;
                         // DFS( root, destinationFile, isAllOccurrence )
                         DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
-                        // BFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
+                        // 
+                    } else if (radioButton1.Checked)
+                    {
+                        BFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
                     }
                 }
                 else
@@ -70,7 +73,6 @@ namespace FileSearching
             catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
 
             // Print hyperlink
-            //this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             
             if (foundFilePath.Count > 0)
             {
@@ -120,7 +122,7 @@ namespace FileSearching
                 {
                     graph.AddNode(checking);
                 }
-                wait(1);
+                wait(0.1);
                 viewer.Graph = graph;
                 
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
@@ -134,7 +136,7 @@ namespace FileSearching
                         if (!isAllOccurrence)
                         {
                             fileFound = true;
-                            foundFilePath = checking;
+                            foundFilePath.Add(checking);
                         }
                     }
                 }
