@@ -1,6 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Diagnostics;
+using GViewer = Microsoft.Msagl.GraphViewerGdi.GViewer;
+using Graph = Microsoft.Msagl.Drawing.Graph;
+using Drawing = Microsoft.Msagl.Drawing;
 
 // TODO: RADIO BUTTON BUAT STATE COBA CARI NTAR ITU GIMANA NYIMPENNYA, ANIMASIIN GRAF, STATE STATE KEK CHECKBOX BUAT FONDASINYA
 
@@ -8,14 +9,14 @@ namespace FileSearching
 {
     public partial class Form1 : Form
     {
-        // create folder browser dialog
         FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+        private GViewer viewer = new GViewer();
+        private Graph graph = new Graph("graph");
 
-        // create viewer for graph
-        Microsoft.Msagl.GraphViewerGdi.GViewer viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
-
-        //create graph object
-        Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph("graph");
+        // INITIALIZE GLOBAL VARIABLES
+        //string[] trackAllOccurrences = { };
+        String foundFilePath = null;
+        bool found = false;
 
         public Form1()
         {
@@ -40,21 +41,124 @@ namespace FileSearching
 
         private void button2_Click(object sender, EventArgs e)
         {
-            string startingDir = folderDialog.SelectedPath;
-            string[] subDir = Directory.GetDirectories(startingDir);
-            // bind the graph to the viewer
-            foreach (string dir in subDir)
+            try
             {
-                System.Threading.Thread.Sleep(25);
-                groupBox1.SuspendLayout();
-                viewer.Graph = null;
-                graph.AddEdge(startingDir, dir);
-                viewer.Graph = graph;
-                groupBox1.ResumeLayout();
+                if (!string.IsNullOrWhiteSpace(folderDialog.SelectedPath) // STARTING DIR
+                    && !string.IsNullOrWhiteSpace(textBox1.Text)) // SEARCHED FILE
+                {
+                    if (radioButton2.Checked)
+                    {
+                        found = false;
+                        // DFS( root, destinationFile, isAllOccurrence )
+                        DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
+                    }
+                }
+                else
+                {
+                    throw new NoStartingPathException();
+                }
             }
-            graph.FindNode(startingDir).Attr.FillColor = Microsoft.Msagl.Drawing.Color.Green;
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            viewer.Graph = null;
+            graph = null;
+            graph = new Graph("graph");
+        }
+
+        // NON-COMPONENT METHODS
+        private void DFS(string currentNode, string searchedFile, Boolean isAllOccurrence)
+        {
+            if (!found || isAllOccurrence)
+            {
+                string[] fileList = Directory.GetFiles(currentNode, "*.*", SearchOption.TopDirectoryOnly);
+                string[] dirList = Directory.GetDirectories(currentNode, "*.*", SearchOption.TopDirectoryOnly);
+                string currentName = currentNode.Split("\\").Last();
+
+                foreach (string file in fileList)
+                {
+                    string fileName = file.Split("\\").Last();
+                    graph.AddEdge(currentName, fileName);
+                    wait(0.2);
+
+                    if (fileName == searchedFile) {
+                        // COLORING THE MATCH NODE
+                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.MistyRose; 
+                        wait(0.1);
+
+                        found = true; // Only useful when all occurences is not needed
+                        foundFilePath = currentNode; // Directory for file that has been 
+
+                        //trackAllOccurrences.Append(currentNode);
+                        /* DO NOTE:
+                            - If you want to track all occurences, then 
+                                1. Make global arrayList
+                                2. Each time you call DFS, empty the list
+                                3. For every file that has found, append currentNode to the list
+                         */
+                        break;
+                    }
+                    else { 
+                        // COLORING THE MISMATCH NODE
+                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.Magenta; 
+                    }
+                }
+
+                if (!found || isAllOccurrence)
+                {
+                    foreach (string topDir in dirList)
+                    {
+                        string dirName = topDir.Split("\\").Last();
+                        graph.AddEdge(currentName, dirName);
+                        wait(0.2);
+                        // Recurrence
+                        DFS(topDir, searchedFile, isAllOccurrence);
+                    }
+                }
+                // COLORING THE FINISHED PROCESSING NODE
+                graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                wait(0.1);
+            }
+            return;
+        }
+
+        private void wait(double seconds)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             viewer.Graph = graph;
-            
+            viewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            while (stopwatch.ElapsedMilliseconds < seconds * 1000) ;
+            Application.DoEvents();
+            return;
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try {
+                if (foundFilePath != null)
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = foundFilePath
+                    };
+                    Process.Start(psi);
+                }
+                else { throw new NoLinkFound(); }
+            } catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
         }
     }
+}
+
+// ADDITIONAL CLASS
+public class NoStartingPathException : Exception
+{
+    public NoStartingPathException() : base("Please select a starting point and file that you want to search.") { }
+}
+
+public class NoLinkFound : Exception
+{
+    public NoLinkFound() : base("Your file is either not found or has not been specified.") { }
 }
