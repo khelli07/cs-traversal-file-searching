@@ -59,6 +59,7 @@ namespace FileSearching
                         found = false;
                         // DFS( root, destinationFile, isAllOccurrence )
                         DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
+                        // BFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
                     }
                 }
                 else
@@ -99,6 +100,55 @@ namespace FileSearching
         }
 
         // NON-COMPONENT METHODS
+        private void BFS(string startingDir, string fileName, Boolean isAllOccurrence)
+        {
+            // TODO Ubah warna node jika gagal dkk, masukkan semua occurence ke foundfilepath, sambungin ke radio bfs
+            Queue<string> findQue = new Queue<string>();
+            List<string> doneCheck = new List<string>();
+            List<string> result = new List<string>();
+
+            findQue.Enqueue(startingDir);
+            Boolean fileFound = false;
+            while (findQue.Count != 0 && fileFound==false)
+            {
+                string checking = findQue.Dequeue();
+                if (doneCheck.Count > 0)
+                {
+                    graph.AddEdge(Directory.GetParent(checking).FullName, checking);
+                }
+                else
+                {
+                    graph.AddNode(checking);
+                }
+                wait(1);
+                viewer.Graph = graph;
+                
+                string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
+                foreach (var file in fileList)
+                {
+                    string fileToken = file.Split('\\').Last();
+                    if (fileToken == fileName)
+                    {
+                        result.Add(file);
+                        graph.FindNode(checking).Attr.FillColor = Drawing.Color.Green;
+                        if (!isAllOccurrence)
+                        {
+                            fileFound = true;
+                            foundFilePath = checking;
+                        }
+                    }
+                }
+                doneCheck.Add(checking);
+                string[] dirList = Directory.GetDirectories(checking, "*.*", SearchOption.TopDirectoryOnly);
+                foreach (var dir in dirList)
+                {
+                    if (!doneCheck.Contains(dir))
+                    {
+                        findQue.Enqueue(dir);
+                    }
+                }
+            }
+        }
         private void DFS(string currentNode, string searchedFile, Boolean isAllOccurrence)
         {
             if (!found || isAllOccurrence)
