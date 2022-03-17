@@ -3,7 +3,6 @@ using GViewer = Microsoft.Msagl.GraphViewerGdi.GViewer;
 using Graph = Microsoft.Msagl.Drawing.Graph;
 using Drawing = Microsoft.Msagl.Drawing;
 
-// TODO: RADIO BUTTON BUAT STATE COBA CARI NTAR ITU GIMANA NYIMPENNYA, ANIMASIIN GRAF, STATE STATE KEK CHECKBOX BUAT FONDASINYA
 
 namespace FileSearching
 {
@@ -15,7 +14,7 @@ namespace FileSearching
 
         // INITIALIZE GLOBAL VARIABLES
         //string[] trackAllOccurrences = { };
-        String foundFilePath = null;
+        List<string> foundFilePath = new List<string>();
         bool found = false;
 
         public Form1()
@@ -32,7 +31,7 @@ namespace FileSearching
             groupBox1.ResumeLayout();
 
             // ubah linkLabel1 ketika load
-            linkLabel1.Text = "---";
+            linkLabel1.Text = "-";
             linkLabel1.ActiveLinkColor = System.Drawing.Color.Black;
             linkLabel1.LinkColor = System.Drawing.Color.Black;
             linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
@@ -68,13 +67,35 @@ namespace FileSearching
                 }
             }
             catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
+
+            // Print hyperlink
+            //this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            
+            if (foundFilePath.Count > 0)
+            {
+                // Ubah style hyperlink dulu
+                linkLabel1.Text = "";
+                linkLabel1.ActiveLinkColor = System.Drawing.Color.Red;
+                linkLabel1.LinkColor = System.Drawing.Color.Blue;
+                linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.SystemDefault;
+                int totalStrLength = 0;
+                for (int i = 0; i < foundFilePath.Count; i++)
+                {
+                    linkLabel1.Text += "-  " + foundFilePath[i] + "\n";
+                    linkLabel1.Links.Add(totalStrLength, foundFilePath[i].Length + 3, foundFilePath[i]);
+                    totalStrLength += foundFilePath[i].Length + 4;
+                }
+            }
         }
 
+        // Button Clear
         private void button3_Click(object sender, EventArgs e)
         {
             viewer.Graph = null;
             graph = null;
             graph = new Graph("graph");
+            foundFilePath = new List<string>();
+            linkLabel1.Text = "";
         }
 
         // NON-COMPONENT METHODS
@@ -98,7 +119,7 @@ namespace FileSearching
                         wait(0.1);
 
                         found = true; // Only useful when all occurences is not needed
-                        foundFilePath = currentNode; // Directory for file that has been 
+                        foundFilePath.Add(currentNode); // Directory for file that has been 
 
                         //trackAllOccurrences.Append(currentNode);
                         /* DO NOTE:
@@ -146,12 +167,13 @@ namespace FileSearching
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try {
+                string path = e.Link.LinkData as string;
                 if (foundFilePath != null)
                 {
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
                         FileName = "explorer.exe",
-                        Arguments = foundFilePath
+                        Arguments = path
                     };
                     Process.Start(psi);
                 }
