@@ -194,14 +194,11 @@ namespace FileSearching
             {
                 string checking = findQue.Dequeue();
                 string checkingLast = checking.Split('\\').Last();
-                if (doneCheck.Count > 0)
-                {
-                    graph.AddEdge(Directory.GetParent(checking).FullName.Split('\\').Last(), checkingLast);
-                }
-                else
+                if (doneCheck.Count == 0)
                 {
                     graph.AddNode(checkingLast);
                 }
+                
                 wait(0.1);
 
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
@@ -250,17 +247,12 @@ namespace FileSearching
                     if (!doneCheck.Contains(dir))
                     {
                         findQue.Enqueue(dir);
+                        graph.AddEdge(checking.Split('\\').Last(), dir.Split('\\').Last());
+                        graph.FindNode(dir.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
                     }
                 }
 
-                if (fileFound)
-                {
-                    foreach (var antrian in findQue)
-                    {
-                        graph.AddEdge(checking.Split('\\').Last(), antrian.Split('\\').Last());
-                        graph.FindNode(antrian.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
-                    }
-                }
+                
                 
                 wait(0);
             }
