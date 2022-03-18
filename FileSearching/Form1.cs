@@ -124,18 +124,16 @@ namespace FileSearching
                 foreach (string file in fileList)
                 {
                     string fileName = file.Split("\\").Last();
-                    wait(0.2);
 
                     if (fileName == searchedFile)
                     {
-                        graph.AddEdge(currentName, fileName);
-                        // COLORING THE MATCH NODE
-                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.MistyRose;
-                        wait(0.1);
-
                         ctrFile++;
                         found = true; // Only useful when all occurences is not needed
                         foundFilePath.Add(currentNode); // Directory for file that has been found
+                        
+                        // COLORING THE MATCH NODE
+                        graph.AddEdge(currentName, (fileName + foundFilePath.Count));
+                        graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.MistyRose;
 
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
@@ -143,6 +141,13 @@ namespace FileSearching
                             return true;
                         };
                     }
+                    else
+                    {
+                        graph.AddEdge(currentName, fileName);
+                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.Magenta;
+                        
+                    }
+                    wait(0.1);
                 }
 
                 if (!found || isAllOccurrence)
@@ -199,7 +204,7 @@ namespace FileSearching
                     graph.AddNode(checkingLast);
                 }
                 
-                wait(0.1);
+                wait(1);
 
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in fileList)
