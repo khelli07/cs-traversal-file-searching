@@ -17,6 +17,7 @@ namespace FileSearching
         //string[] trackAllOccurrences = { };
         List<string> foundFilePath = new List<string>();
         bool found = false;
+        Stopwatch runTime = new Stopwatch();
 
         public Form1()
         {
@@ -52,6 +53,8 @@ namespace FileSearching
         {
             try
             {
+                // Save timestamp when search button is clicked
+                runTime.Start();
                 if (!string.IsNullOrWhiteSpace(folderDialog.SelectedPath) // STARTING DIR
                     && !string.IsNullOrWhiteSpace(textBox1.Text)) // SEARCHED FILE
                 {
@@ -73,8 +76,11 @@ namespace FileSearching
             }
             catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
 
+            // Stop stopwatch and writedown the elapsed time
+            runTime.Stop();
+            double elapsedTimeInSecond = runTime.ElapsedMilliseconds / 1000.0;
+            label8.Text += elapsedTimeInSecond + "s";
             // Print hyperlink
-            
             if (foundFilePath.Count > 0)
             {
                 // Ubah style hyperlink dulu
@@ -100,6 +106,8 @@ namespace FileSearching
             graph = new Graph("graph");
             foundFilePath = new List<string>();
             linkLabel1.Text = "";
+            label8.Text = "Elapsed Time:";
+            runTime = new Stopwatch();
         }
 
         // NON-COMPONENT METHODS
