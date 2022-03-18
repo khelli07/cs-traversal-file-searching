@@ -58,7 +58,7 @@ namespace FileSearching
                     {
                         found = false;
                         // DFS( root, destinationFile, isAllOccurrence )
-                        DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
+                        bool fileIsFound = DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
                         // 
                     } else if (radioButton1.Checked)
                     {
@@ -102,6 +102,73 @@ namespace FileSearching
         }
 
         // NON-COMPONENT METHODS
+        private bool DFS(string currentNode, string searchedFile, bool isAllOccurrence)
+        { 
+            bool isInChildFile = false;
+            bool isInChildFolder = false;
+            bool isInChild = false;
+            if (!found || isAllOccurrence)
+            {
+                string[] fileList = Directory.GetFiles(currentNode, "*.*", SearchOption.TopDirectoryOnly);
+                string[] dirList = Directory.GetDirectories(currentNode, "*.*", SearchOption.TopDirectoryOnly);
+                string currentName = currentNode.Split("\\").Last();
+                foreach (string file in fileList)
+                {
+                    string fileName = file.Split("\\").Last();
+                    wait(0.2);
+
+                    if (fileName == searchedFile)
+                    {
+                        graph.AddEdge(currentName, fileName);
+                        // COLORING THE MATCH NODE
+                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.MistyRose;
+                        wait(0.1);
+
+                        isInChildFile = true;
+                        found = true; // Only useful when all occurences is not needed
+                        foundFilePath.Add(currentNode); // Directory for file that has been found
+
+                        /* DO NOTE:
+                            - If you want to track all occurences, then 
+                                1. Make global arrayList
+                                2. Each time you call DFS, empty the list
+                                3. For every file that has found, append currentNode to the list
+                         */
+                        if (!isAllOccurrence) {
+                            // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
+                            graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                            return true;
+                        };
+                    }
+                }
+
+                if (!found || isAllOccurrence)
+                {
+                    foreach (string topDir in dirList)
+                    {
+                        string dirName = topDir.Split("\\").Last();
+                        graph.AddEdge(currentName, dirName);
+                        wait(0.2);
+                        // Recurrence
+                        isInChildFolder = DFS(topDir, searchedFile, isAllOccurrence);
+                    }
+                }
+
+                isInChild = (isInChildFile || isInChildFolder);
+                // COLORING THE FINISHED PROCESSING NODE
+                if (isInChild) { 
+                    // COLOR IF FOUND
+                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                } else { 
+                    // COLOR IF NOT FOUND
+                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;  
+                }
+                wait(0.1);
+            }
+
+            return isInChild;
+        }
+
         private void BFS(string startingDir, string fileName, Boolean isAllOccurrence)
         {
             // TODO Ubah warna node jika gagal dkk, masukkan semua occurence ke foundfilepath, sambungin ke radio bfs
@@ -150,60 +217,6 @@ namespace FileSearching
                     }
                 }
             }
-        }
-        private void DFS(string currentNode, string searchedFile, Boolean isAllOccurrence)
-        {
-            if (!found || isAllOccurrence)
-            {
-                string[] fileList = Directory.GetFiles(currentNode, "*.*", SearchOption.TopDirectoryOnly);
-                string[] dirList = Directory.GetDirectories(currentNode, "*.*", SearchOption.TopDirectoryOnly);
-                string currentName = currentNode.Split("\\").Last();
-
-                foreach (string file in fileList)
-                {
-                    string fileName = file.Split("\\").Last();
-                    graph.AddEdge(currentName, fileName);
-                    wait(0.2);
-
-                    if (fileName == searchedFile) {
-                        // COLORING THE MATCH NODE
-                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.MistyRose; 
-                        wait(0.1);
-
-                        found = true; // Only useful when all occurences is not needed
-                        foundFilePath.Add(currentNode); // Directory for file that has been 
-
-                        //trackAllOccurrences.Append(currentNode);
-                        /* DO NOTE:
-                            - If you want to track all occurences, then 
-                                1. Make global arrayList
-                                2. Each time you call DFS, empty the list
-                                3. For every file that has found, append currentNode to the list
-                         */
-                        break;
-                    }
-                    else { 
-                        // COLORING THE MISMATCH NODE
-                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.Magenta; 
-                    }
-                }
-
-                if (!found || isAllOccurrence)
-                {
-                    foreach (string topDir in dirList)
-                    {
-                        string dirName = topDir.Split("\\").Last();
-                        graph.AddEdge(currentName, dirName);
-                        wait(0.2);
-                        // Recurrence
-                        DFS(topDir, searchedFile, isAllOccurrence);
-                    }
-                }
-                // COLORING THE FINISHED PROCESSING NODE
-                graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
-                wait(0.1);
-            }
-            return;
         }
 
         private void wait(double seconds)
