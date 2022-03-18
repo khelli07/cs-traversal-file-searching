@@ -193,33 +193,57 @@ namespace FileSearching
             while (findQue.Count != 0 && fileFound==false)
             {
                 string checking = findQue.Dequeue();
+                string checkingLast = checking.Split('\\').Last();
                 if (doneCheck.Count > 0)
                 {
-                    graph.AddEdge(Directory.GetParent(checking).FullName, checking);
+                    graph.AddEdge(Directory.GetParent(checking).FullName.Split('\\').Last(), checkingLast);
                 }
                 else
                 {
-                    graph.AddNode(checking);
+                    graph.AddNode(checkingLast);
                 }
                 wait(0.1);
-                viewer.Graph = graph;
-                
+
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in fileList)
                 {
+                    
                     string fileToken = file.Split('\\').Last();
                     if (fileToken == fileName)
                     {
                         result.Add(file);
-                        graph.FindNode(checking).Attr.FillColor = Drawing.Color.Green;
+                        graph.AddEdge(checkingLast, file.Split('\\').Last() + result.Count);
+                        graph.FindNode(file.Split('\\').Last() + result.Count).Attr.FillColor = Drawing.Color.MistyRose;
+                        string[] startingDirSplit = startingDir.Split('\\')[..^1];
+                        string[] checkingSplit = checking.Split('\\');
+                        foreach (var token in checkingSplit)
+                        {
+                            if (!startingDirSplit.Contains(token))
+                            {
+                                graph.FindNode(token).Attr.FillColor = Drawing.Color.Green;
+                            }
+                        }
                         if (!isAllOccurrence)
                         {
                             fileFound = true;
-                            foundFilePath.Add(checking);
                         }
+                        
+                        foundFilePath.Add(checking);
                     }
+                    else
+                    {
+                        graph.AddEdge(checkingLast, file.Split('\\').Last());
+                        graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
+                        
+                    }
+                    wait(0);
                 }
                 doneCheck.Add(checking);
+                if (graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor != Drawing.Color.Green)
+                {
+                    graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
+                }
+                
                 string[] dirList = Directory.GetDirectories(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var dir in dirList)
                 {
@@ -228,6 +252,17 @@ namespace FileSearching
                         findQue.Enqueue(dir);
                     }
                 }
+
+                if (fileFound)
+                {
+                    foreach (var antrian in findQue)
+                    {
+                        graph.AddEdge(checking.Split('\\').Last(), antrian.Split('\\').Last());
+                        graph.FindNode(antrian.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
+                    }
+                }
+                
+                wait(0);
             }
         }
 
