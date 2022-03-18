@@ -154,7 +154,14 @@ namespace FileSearching
                         wait(0.2);
                         // Recurrence
                         bool temp = DFS(topDir, searchedFile, isAllOccurrence);
-                        if (temp) { ctrFolder++; }
+                        if (temp) { 
+                            ctrFolder++;
+                            if (!isAllOccurrence)
+                            {
+                                graph.FindNode(currentName).Attr.FillColor= Drawing.Color.Green;
+                                return true;
+                            }
+                        }
                     }
                 }
 
