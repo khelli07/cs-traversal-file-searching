@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using GViewer = Microsoft.Msagl.GraphViewerGdi.GViewer;
 using Graph = Microsoft.Msagl.Drawing.Graph;
+using Node = Microsoft.Msagl.Drawing.Node;
 using Drawing = Microsoft.Msagl.Drawing;
 
 
@@ -156,12 +157,16 @@ namespace FileSearching
 
                 isInChild = (isInChildFile || isInChildFolder);
                 // COLORING THE FINISHED PROCESSING NODE
+                Node tmp = graph.FindNode(currentName);
                 if (isInChild) { 
                     // COLOR IF FOUND
                     graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
                 } else { 
                     // COLOR IF NOT FOUND
-                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;  
+                    if (tmp.Attr.FillColor == Drawing.Color.Green)
+                    {
+                        graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;
+                    }
                 }
                 wait(0.1);
             }
