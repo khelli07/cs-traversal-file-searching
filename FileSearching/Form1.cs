@@ -138,6 +138,7 @@ namespace FileSearching
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
                             graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                            wait(0.1);
                             return true;
                         };
                     }
@@ -191,7 +192,6 @@ namespace FileSearching
             // TODO Ubah warna node jika gagal dkk, masukkan semua occurence ke foundfilepath, sambungin ke radio bfs
             Queue<string> findQue = new Queue<string>();
             List<string> doneCheck = new List<string>();
-            List<string> result = new List<string>();
 
             findQue.Enqueue(startingDir);
             Boolean fileFound = false;
@@ -209,13 +209,13 @@ namespace FileSearching
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in fileList)
                 {
-                    
                     string fileToken = file.Split('\\').Last();
                     if (fileToken == fileName)
                     {
-                        result.Add(file);
-                        graph.AddEdge(checkingLast, file.Split('\\').Last() + result.Count);
-                        graph.FindNode(file.Split('\\').Last() + result.Count).Attr.FillColor = Drawing.Color.MistyRose;
+                        foundFilePath.Add(checking);
+                        graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
+                        graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.MistyRose;
+                        
                         string[] startingDirSplit = startingDir.Split('\\')[..^1];
                         string[] checkingSplit = checking.Split('\\');
                         foreach (var token in checkingSplit)
@@ -229,13 +229,18 @@ namespace FileSearching
                         {
                             fileFound = true;
                         }
-                        
-                        foundFilePath.Add(checking);
                     }
                     else
                     {
                         graph.AddEdge(checkingLast, file.Split('\\').Last());
-                        graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
+                        if (fileFound)
+                        {
+                            graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
+                        }
+                        else
+                        {
+                            graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
+                        }
                         
                     }
                     wait(0);
@@ -256,9 +261,6 @@ namespace FileSearching
                         graph.FindNode(dir.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
                     }
                 }
-
-                
-                
                 wait(0);
             }
         }
