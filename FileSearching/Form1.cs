@@ -105,9 +105,9 @@ namespace FileSearching
         // NON-COMPONENT METHODS
         private bool DFS(string currentNode, string searchedFile, bool isAllOccurrence)
         { 
-            bool isInChildFile = false;
-            bool isInChildFolder = false;
             bool isInChild = false;
+            int ctrFile = 0;
+            int ctrFolder = 0;
             if (!found || isAllOccurrence)
             {
                 string[] fileList = Directory.GetFiles(currentNode, "*.*", SearchOption.TopDirectoryOnly);
@@ -125,16 +125,10 @@ namespace FileSearching
                         graph.FindNode(fileName).Attr.FillColor = Drawing.Color.MistyRose;
                         wait(0.1);
 
-                        isInChildFile = true;
+                        ctrFile++;
                         found = true; // Only useful when all occurences is not needed
                         foundFilePath.Add(currentNode); // Directory for file that has been found
 
-                        /* DO NOTE:
-                            - If you want to track all occurences, then 
-                                1. Make global arrayList
-                                2. Each time you call DFS, empty the list
-                                3. For every file that has found, append currentNode to the list
-                         */
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
                             graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
@@ -151,11 +145,12 @@ namespace FileSearching
                         graph.AddEdge(currentName, dirName);
                         wait(0.2);
                         // Recurrence
-                        isInChildFolder = DFS(topDir, searchedFile, isAllOccurrence);
+                        bool temp = DFS(topDir, searchedFile, isAllOccurrence);
+                        if (temp) { ctrFolder++; }
                     }
                 }
 
-                isInChild = (isInChildFile || isInChildFolder);
+                isInChild = (ctrFile > 0 || ctrFolder > 0);
                 // COLORING THE FINISHED PROCESSING NODE
                 Node tmp = graph.FindNode(currentName);
                 if (isInChild) { 
@@ -163,10 +158,7 @@ namespace FileSearching
                     graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
                 } else { 
                     // COLOR IF NOT FOUND
-                    if (tmp.Attr.FillColor == Drawing.Color.Green)
-                    {
-                        graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;
-                    }
+                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;
                 }
                 wait(0.1);
             }
