@@ -142,7 +142,7 @@ namespace FileSearching
                         
                         // COLORING THE MATCH NODE
                         graph.AddEdge(currentName, (fileName + foundFilePath.Count)).Attr.Color = Drawing.Color.Green;
-                        graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.MistyRose;
+                        graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.LightGreen;
 
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
@@ -233,7 +233,7 @@ namespace FileSearching
                         // Color file leaf
                         edgeMap[file.Split('\\').Last() + foundFilePath.Count] = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
                         edgeMap[file.Split('\\').Last() + foundFilePath.Count].Attr.Color = Drawing.Color.Green;
-                        graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.MistyRose;
+                        graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.LightGreen;
                         
                         string[] startingDirSplit = startingDir.Split('\\')[..^1];
                         string[] checkingSplit = checking.Split('\\');
