@@ -242,20 +242,15 @@ namespace FileSearching
                         {
                             dirOrder.Add(dir);
                         }
-                        string path = String.Join('\\', dirOrder.ToArray());
-                        // Color the file dir node
-                        graph.FindNode(path).Attr.FillColor = Drawing.Color.Green;
-                        if (edgeMap.ContainsKey(path))
-                        {
-                            edgeMap[path].Attr.Color = Drawing.Color.Green; 
-                        }
+                        // Color starting dir
+                        graph.FindNode(startingDir).Attr.FillColor = Drawing.Color.Green;
                         string[] checkingSplit = checking.Split('\\');
                         for (int i = 0; i < checkingSplit.Length; i++)
                         {
                             if (!dirOrder.Contains(checkingSplit[i]))
                             {
                                 dirOrder.Add(checkingSplit[i]);
-                                path = String.Join('\\', dirOrder.ToArray());
+                                string path = String.Join('\\', dirOrder.ToArray());
                                 // Color the file dir node
                                 graph.FindNode(path).Attr.FillColor = Drawing.Color.Green;
                                 if (edgeMap.ContainsKey(path))
