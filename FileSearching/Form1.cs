@@ -4,7 +4,6 @@ using Graph = Microsoft.Msagl.Drawing.Graph;
 using Node = Microsoft.Msagl.Drawing.Node;
 using Drawing = Microsoft.Msagl.Drawing;
 
-
 namespace FileSearching
 {
     public partial class Form1 : Form
@@ -18,6 +17,7 @@ namespace FileSearching
         List<string> foundFilePath = new List<string>();
         bool found = false;
         Stopwatch runTime = new Stopwatch();
+        bool clearBtnClicked = false;
 
         public Form1()
         {
@@ -53,6 +53,13 @@ namespace FileSearching
         {
             try
             {
+                // Check if clear button has been clicked
+                if (!clearBtnClicked)
+                {
+                    this.button3_Click(sender, new EventArgs());
+                }
+                // Change it to false for next use
+                clearBtnClicked = false;
                 // Save timestamp when search button is clicked
                 runTime.Start();
                 if (!string.IsNullOrWhiteSpace(folderDialog.SelectedPath) // STARTING DIR
@@ -101,11 +108,13 @@ namespace FileSearching
         // Button Clear
         private void button3_Click(object sender, EventArgs e)
         {
+            clearBtnClicked = true;
             viewer.Graph = null;
             graph = null;
             graph = new Graph("graph");
             foundFilePath = new List<string>();
-            linkLabel1.Text = "";
+            linkLabel1.Text = "-";
+            linkLabel1.Links.Clear(); // Clear all the hyperlinks from before
             label8.Text = "Elapsed Time:";
             runTime = new Stopwatch();
         }
@@ -132,7 +141,7 @@ namespace FileSearching
                         foundFilePath.Add(currentNode); // Directory for file that has been found
                         
                         // COLORING THE MATCH NODE
-                        graph.AddEdge(currentName, (fileName + foundFilePath.Count));
+                        graph.AddEdge(currentName, (fileName + foundFilePath.Count)).Attr.Color = Drawing.Color.Green;
                         graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.MistyRose;
 
                         if (!isAllOccurrence) {
@@ -144,7 +153,8 @@ namespace FileSearching
                     }
                     else
                     {
-                        graph.AddEdge(currentName, fileName);
+                        // If it's not what we're looking for
+                        graph.AddEdge(currentName, fileName).Attr.Color = Drawing.Color.Magenta;
                         graph.FindNode(fileName).Attr.FillColor = Drawing.Color.Magenta;
                         
                     }
@@ -156,17 +166,23 @@ namespace FileSearching
                     foreach (string topDir in dirList)
                     {
                         string dirName = topDir.Split("\\").Last();
-                        graph.AddEdge(currentName, dirName);
+                        Drawing.Edge newEdge = graph.AddEdge(currentName, dirName);
                         wait(0.2);
                         // Recurrence
                         bool temp = DFS(topDir, searchedFile, isAllOccurrence);
                         if (temp) { 
                             ctrFolder++;
+                            // color the edge to green if found
+                            newEdge.Attr.Color = Drawing.Color.Green;
                             if (!isAllOccurrence)
                             {
                                 graph.FindNode(currentName).Attr.FillColor= Drawing.Color.Green;
                                 return true;
                             }
+                        } else
+                        {
+                            // Edge color if not found
+                            newEdge.Attr.Color= Drawing.Color.Magenta;
                         }
                     }
                 }
@@ -213,16 +229,30 @@ namespace FileSearching
                     if (fileToken == fileName)
                     {
                         foundFilePath.Add(checking);
-                        graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
+                        Drawing.Edge newEdge = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
+                        newEdge.Attr.Color = Drawing.Color.Green;
                         graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.MistyRose;
                         
                         string[] startingDirSplit = startingDir.Split('\\')[..^1];
                         string[] checkingSplit = checking.Split('\\');
-                        foreach (var token in checkingSplit)
+                        for (int i = 0; i < checkingSplit.Length; i++)
                         {
-                            if (!startingDirSplit.Contains(token))
+                            if (!startingDirSplit.Contains(checkingSplit[i]))
                             {
-                                graph.FindNode(token).Attr.FillColor = Drawing.Color.Green;
+                                // Color the Node where the file is inside it
+                                Node thisNode = graph.FindNode(checkingSplit[i]);
+                                thisNode.Attr.FillColor = Drawing.Color.Green;
+                                // Color the edge
+                                if (i < checkingSplit.Length - 1)
+                                {
+                                    // Get all edges in this node
+                                    //List<Drawing.Edge> Edges = new List<Drawing.Edge>();
+                                    //foreach (Drawing.Edge edge in thisNode.Edges)
+                                    //{
+                                    //    Edges.Add(edge);
+                                    //}
+                                    graph.AddEdge(checkingSplit[i], checkingSplit[i+1]).Attr.Color = Drawing.Color.Green;
+                                }
                             }
                         }
                         if (!isAllOccurrence)
@@ -232,13 +262,14 @@ namespace FileSearching
                     }
                     else
                     {
-                        graph.AddEdge(checkingLast, file.Split('\\').Last());
+                        Drawing.Edge newEdge = graph.AddEdge(checkingLast, file.Split('\\').Last());
                         if (fileFound)
                         {
                             graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
                         }
                         else
                         {
+                            newEdge.Attr.Color = Drawing.Color.Magenta;
                             graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
                         }
                         
