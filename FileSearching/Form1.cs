@@ -143,7 +143,7 @@ namespace FileSearching
                         // COLORING THE MATCH NODE
                         graph.AddEdge(currentName, (fileName + foundFilePath.Count)).Attr.Color = Drawing.Color.Green;
                         graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.LightGreen;
-
+                        
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
                             graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
