@@ -208,6 +208,7 @@ namespace FileSearching
             // TODO Ubah warna node jika gagal dkk, masukkan semua occurence ke foundfilepath, sambungin ke radio bfs
             Queue<string> findQue = new Queue<string>();
             List<string> doneCheck = new List<string>();
+            Dictionary<string, Drawing.Edge> edgeMap = new Dictionary<string, Drawing.Edge>();
 
             findQue.Enqueue(startingDir);
             Boolean fileFound = false;
@@ -220,7 +221,7 @@ namespace FileSearching
                     graph.AddNode(checkingLast);
                 }
                 
-                wait(1);
+                wait(0.2);
 
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in fileList)
@@ -229,8 +230,8 @@ namespace FileSearching
                     if (fileToken == fileName)
                     {
                         foundFilePath.Add(checking);
-                        Drawing.Edge newEdge = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
-                        newEdge.Attr.Color = Drawing.Color.Green;
+                        edgeMap[file.Split('\\').Last()] = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
+                        edgeMap[file.Split('\\').Last()].Attr.Color = Drawing.Color.Green;
                         graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.MistyRose;
                         
                         string[] startingDirSplit = startingDir.Split('\\')[..^1];
@@ -245,13 +246,7 @@ namespace FileSearching
                                 // Color the edge
                                 if (i < checkingSplit.Length - 1)
                                 {
-                                    // Get all edges in this node
-                                    //List<Drawing.Edge> Edges = new List<Drawing.Edge>();
-                                    //foreach (Drawing.Edge edge in thisNode.Edges)
-                                    //{
-                                    //    Edges.Add(edge);
-                                    //}
-                                    graph.AddEdge(checkingSplit[i], checkingSplit[i+1]).Attr.Color = Drawing.Color.Green;
+                                    edgeMap[checkingSplit[i+1]].Attr.Color = Drawing.Color.Green;
                                 }
                             }
                         }
@@ -262,23 +257,24 @@ namespace FileSearching
                     }
                     else
                     {
-                        Drawing.Edge newEdge = graph.AddEdge(checkingLast, file.Split('\\').Last());
+                        edgeMap[file.Split('\\').Last()] = graph.AddEdge(checkingLast, file.Split('\\').Last());
                         if (fileFound)
                         {
                             graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
                         }
                         else
                         {
-                            newEdge.Attr.Color = Drawing.Color.Magenta;
+                            edgeMap[file.Split('\\').Last()].Attr.Color = Drawing.Color.Magenta;
                             graph.FindNode(file.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
                         }
                         
                     }
-                    wait(0);
+                    wait(0.1);
                 }
                 doneCheck.Add(checking);
                 if (graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor != Drawing.Color.Green)
                 {
+                    edgeMap[checkingLast.Split('\\').Last()].Attr.Color = Drawing.Color.Magenta;
                     graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
                 }
                 
@@ -288,11 +284,12 @@ namespace FileSearching
                     if (!doneCheck.Contains(dir))
                     {
                         findQue.Enqueue(dir);
-                        graph.AddEdge(checking.Split('\\').Last(), dir.Split('\\').Last());
+                        edgeMap[dir.Split('\\').Last()] = graph.AddEdge(checking.Split('\\').Last(), dir.Split('\\').Last());
+                        edgeMap[dir.Split('\\').Last()].Attr.Color = Drawing.Color.Gray;
                         graph.FindNode(dir.Split('\\').Last()).Attr.FillColor = Drawing.Color.Gray;
                     }
                 }
-                wait(0);
+                wait(0.1);
             }
         }
 
