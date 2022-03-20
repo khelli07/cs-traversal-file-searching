@@ -230,8 +230,9 @@ namespace FileSearching
                     if (fileToken == fileName)
                     {
                         foundFilePath.Add(checking);
-                        edgeMap[file.Split('\\').Last()] = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
-                        edgeMap[file.Split('\\').Last()].Attr.Color = Drawing.Color.Green;
+                        // Color file leaf
+                        edgeMap[file.Split('\\').Last() + foundFilePath.Count] = graph.AddEdge(checkingLast, file.Split('\\').Last() + foundFilePath.Count);
+                        edgeMap[file.Split('\\').Last() + foundFilePath.Count].Attr.Color = Drawing.Color.Green;
                         graph.FindNode(file.Split('\\').Last() + foundFilePath.Count).Attr.FillColor = Drawing.Color.MistyRose;
                         
                         string[] startingDirSplit = startingDir.Split('\\')[..^1];
@@ -240,13 +241,12 @@ namespace FileSearching
                         {
                             if (!startingDirSplit.Contains(checkingSplit[i]))
                             {
-                                // Color the Node where the file is inside it
+                                // Color the file dir node
                                 Node thisNode = graph.FindNode(checkingSplit[i]);
                                 thisNode.Attr.FillColor = Drawing.Color.Green;
-                                // Color the edge
-                                if (i < checkingSplit.Length - 1)
+                                if (edgeMap.ContainsKey(checkingSplit[i]))
                                 {
-                                    edgeMap[checkingSplit[i+1]].Attr.Color = Drawing.Color.Green;
+                                    edgeMap[checkingSplit[i]].Attr.Color = Drawing.Color.Green; 
                                 }
                             }
                         }
@@ -274,7 +274,10 @@ namespace FileSearching
                 doneCheck.Add(checking);
                 if (graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor != Drawing.Color.Green)
                 {
-                    edgeMap[checkingLast.Split('\\').Last()].Attr.Color = Drawing.Color.Magenta;
+                    if (edgeMap.ContainsKey(checkingLast.Split('\\').Last()))
+                    {
+                        edgeMap[checkingLast.Split('\\').Last()].Attr.Color = Drawing.Color.Magenta;
+                    }
                     graph.FindNode(checkingLast.Split('\\').Last()).Attr.FillColor = Drawing.Color.Magenta;
                 }
                 
