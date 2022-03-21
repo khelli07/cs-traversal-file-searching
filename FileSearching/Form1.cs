@@ -265,7 +265,7 @@ namespace FileSearching
                         // Color file leaf
                         edgeMap[file] = graph.AddEdge(checking, file);
                         edgeMap[file].Attr.Color = Drawing.Color.Green;
-                        graph.FindNode(file).Attr.FillColor = Drawing.Color.MistyRose;
+                        graph.FindNode(file).Attr.FillColor = Drawing.Color.LightGreen;
                         graph.FindNode(file).LabelText = file.Split('\\').Last();
 
                         // Color all parent node
