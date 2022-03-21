@@ -19,6 +19,9 @@ namespace FileSearching
         Stopwatch runTime = new Stopwatch();
         bool clearBtnClicked = false;
 
+        //Dictionary<string, bool> nodeReserved = new Dictionary<string, bool>();
+        //int counter = 0;
+
         public Form1()
         {
             InitializeComponent();
@@ -68,9 +71,10 @@ namespace FileSearching
                     if (radioButton2.Checked)
                     {
                         found = false;
-                        // DFS( root, destinationFile, isAllOccurrence )
-                        bool fileIsFound = DFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
-                        // 
+                        
+                        string root = folderDialog.SelectedPath;
+                        bool fileIsFound = DFS(root, textBox1.Text.Trim(), checkBox1.Checked);
+                         
                     } else if (radioButton1.Checked)
                     {
                         BFS(folderDialog.SelectedPath, textBox1.Text.Trim(), checkBox1.Checked);
@@ -119,6 +123,25 @@ namespace FileSearching
             runTime = new Stopwatch();
         }
 
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                string path = e.Link.LinkData as string;
+                if (foundFilePath != null)
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = path
+                    };
+                    Process.Start(psi);
+                }
+                else { throw new NoLinkFound(); }
+            }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
+        }
+
         // NON-COMPONENT METHODS
         private bool DFS(string currentNode, string searchedFile, bool isAllOccurrence)
         { 
@@ -141,12 +164,15 @@ namespace FileSearching
                         foundFilePath.Add(currentNode); // Directory for file that has been found
                         
                         // COLORING THE MATCH NODE
-                        graph.AddEdge(currentName, (fileName + foundFilePath.Count)).Attr.Color = Drawing.Color.Green;
-                        graph.FindNode((fileName + foundFilePath.Count)).Attr.FillColor = Drawing.Color.LightGreen;
+                        graph.AddEdge(currentNode, file).Attr.Color = Drawing.Color.Green;
+                        graph.FindNode(file).Attr.FillColor = Drawing.Color.LightGreen;
                         
+                        graph.FindNode(currentNode).LabelText = currentName;
+                        graph.FindNode(file).LabelText = fileName;
+
                         if (!isAllOccurrence) {
                             // COLOR THE PARENT NOW BECAUSE THE CONTROL WILL BE RETURNED
-                            graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                            graph.FindNode(currentNode).Attr.FillColor = Drawing.Color.Green;
                             wait(0.1);
                             return true;
                         };
@@ -154,8 +180,11 @@ namespace FileSearching
                     else
                     {
                         // If it's not what we're looking for
-                        graph.AddEdge(currentName, fileName).Attr.Color = Drawing.Color.Magenta;
-                        graph.FindNode(fileName).Attr.FillColor = Drawing.Color.Magenta;
+                        graph.AddEdge(currentNode, file).Attr.Color = Drawing.Color.Magenta;
+                        graph.FindNode(file).Attr.FillColor = Drawing.Color.Magenta;
+
+                        graph.FindNode(currentNode).LabelText = currentName;
+                        graph.FindNode(file).LabelText = fileName;
                         
                     }
                     wait(0.1);
@@ -166,8 +195,11 @@ namespace FileSearching
                     foreach (string topDir in dirList)
                     {
                         string dirName = topDir.Split("\\").Last();
-                        Drawing.Edge newEdge = graph.AddEdge(currentName, dirName);
+                        Drawing.Edge newEdge = graph.AddEdge(currentNode, topDir);
                         wait(0.2);
+
+                        graph.FindNode(currentNode).LabelText = currentName;
+                        graph.FindNode(topDir).LabelText = dirName;
                         // Recurrence
                         bool temp = DFS(topDir, searchedFile, isAllOccurrence);
                         if (temp) { 
@@ -176,7 +208,7 @@ namespace FileSearching
                             newEdge.Attr.Color = Drawing.Color.Green;
                             if (!isAllOccurrence)
                             {
-                                graph.FindNode(currentName).Attr.FillColor= Drawing.Color.Green;
+                                graph.FindNode(currentNode).Attr.FillColor= Drawing.Color.Green;
                                 return true;
                             }
                         } else
@@ -189,13 +221,13 @@ namespace FileSearching
 
                 isInChild = (ctrFile > 0 || ctrFolder > 0);
                 // COLORING THE FINISHED PROCESSING NODE
-                Node tmp = graph.FindNode(currentName);
+                Node tmp = graph.FindNode(currentNode);
                 if (isInChild) { 
                     // COLOR IF FOUND
-                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Green;
+                    graph.FindNode(currentNode).Attr.FillColor = Drawing.Color.Green;
                 } else { 
                     // COLOR IF NOT FOUND
-                    graph.FindNode(currentName).Attr.FillColor = Drawing.Color.Magenta;
+                    graph.FindNode(currentNode).Attr.FillColor = Drawing.Color.Magenta;
                 }
                 wait(0.1);
             }
@@ -242,20 +274,15 @@ namespace FileSearching
                         {
                             dirOrder.Add(dir);
                         }
-                        string path = String.Join('\\', dirOrder.ToArray());
-                        // Color the file dir node
-                        graph.FindNode(path).Attr.FillColor = Drawing.Color.Green;
-                        if (edgeMap.ContainsKey(path))
-                        {
-                            edgeMap[path].Attr.Color = Drawing.Color.Green; 
-                        }
+                        // Color starting dir
+                        graph.FindNode(startingDir).Attr.FillColor = Drawing.Color.Green;
                         string[] checkingSplit = checking.Split('\\');
                         for (int i = 0; i < checkingSplit.Length; i++)
                         {
                             if (!dirOrder.Contains(checkingSplit[i]))
                             {
                                 dirOrder.Add(checkingSplit[i]);
-                                path = String.Join('\\', dirOrder.ToArray());
+                                string path = String.Join('\\', dirOrder.ToArray());
                                 // Color the file dir node
                                 graph.FindNode(path).Attr.FillColor = Drawing.Color.Green;
                                 if (edgeMap.ContainsKey(path))
@@ -326,23 +353,6 @@ namespace FileSearching
             while (stopwatch.ElapsedMilliseconds < seconds * 1000) ;
             Application.DoEvents();
             return;
-        }
-
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            try {
-                string path = e.Link.LinkData as string;
-                if (foundFilePath != null)
-                {
-                    ProcessStartInfo psi = new ProcessStartInfo
-                    {
-                        FileName = "explorer.exe",
-                        Arguments = path
-                    };
-                    Process.Start(psi);
-                }
-                else { throw new NoLinkFound(); }
-            } catch (Exception ex) { MessageBox.Show($"{ex.Message}"); }
         }
     }
 }
