@@ -258,6 +258,7 @@ namespace FileSearching
                 wait(0.2);
 
                 string[] fileList = Directory.GetFiles(checking, "*.*", SearchOption.TopDirectoryOnly);
+                string[] dirList = Directory.GetDirectories(checking, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in fileList)
                 {
                     string fileToken = file.Split('\\').Last();
@@ -331,8 +332,7 @@ namespace FileSearching
                     graph.FindNode(checking).Attr.FillColor = Drawing.Color.Magenta;
                 }
                 
-                // Queue next nodes
-                string[] dirList = Directory.GetDirectories(checking, "*.*", SearchOption.TopDirectoryOnly);
+                // Queue next node
                 foreach (var dir in dirList)
                 {
                     if (!doneCheck.Contains(dir))
