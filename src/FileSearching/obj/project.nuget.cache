@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "COHA8U3LJwGGJ35tbiulf7R+elyMbGDkhO1U0qf+ThlLdOfaPll6jWI2L4RDOz+FUBTbncFZKv5ohwPX2VKa1A==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\apn72\\OneDrive - Institut Teknologi Bandung\\1KULIAH\\Semester 4\\Strategi Algoritma\\Tugas\\Tubes 2\\cs-traversal-file-searching\\src\\FileSearching\\FileSearching.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\apn72\\.nuget\\packages\\automaticgraphlayout\\1.1.11\\automaticgraphlayout.1.1.11.nupkg.sha512",
+    "C:\\Users\\apn72\\.nuget\\packages\\automaticgraphlayout.drawing\\1.1.11\\automaticgraphlayout.drawing.1.1.11.nupkg.sha512",
+    "C:\\Users\\apn72\\.nuget\\packages\\automaticgraphlayout.graphviewergdi\\1.1.11\\automaticgraphlayout.graphviewergdi.1.1.11.nupkg.sha512",
+    "C:\\Users\\apn72\\.nuget\\packages\\automaticgraphlayout.wpfgraphcontrol\\1.1.11\\automaticgraphlayout.wpfgraphcontrol.1.1.11.nupkg.sha512"
+  ],
+  "logs": []
+}

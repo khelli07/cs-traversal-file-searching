@@ -1,0 +1,10 @@
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\FileSearching.exe
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\FileSearching.dll
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\FileSearching.deps.json
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\FileSearching.runtimeconfig.json
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\FileSearching.pdb
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\aa-DJ\FileSearching.resources.dll
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\AutomaticGraphLayout.dll
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\AutomaticGraphLayout.Drawing.dll
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\Microsoft.Msagl.GraphViewerGdi.dll
+C:\Users\apn72\OneDrive - Institut Teknologi Bandung\1KULIAH\Semester 4\Strategi Algoritma\Tugas\Tubes 2\cs-traversal-file-searching\FileSearching\bin\Release\net6.0-windows\publish\Microsoft.Msagl.WpfGraphControl.dll
